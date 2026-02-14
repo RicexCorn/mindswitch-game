@@ -67,11 +67,6 @@ const alertEl = document.getElementById('alert-text');
 const freezeOverlay = document.getElementById('freeze-overlay');
 const gameContainer = document.getElementById('game-container');
 
-const maxVelocity = 25;
-
-obj.vx = Math.max(-maxVelocity, Math.min(maxVelocity, obj.vx));
-obj.vy = Math.max(-maxVelocity, Math.min(maxVelocity, obj.vy));
-
 // Audio Functions
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playTone(freq, type, dur, vol = 0.05) {
@@ -386,6 +381,10 @@ function spawnSingle() {
 
         obj.vx = (currentX - obj.lastX) * CONFIG.throwForce;
         obj.vy = (currentY - obj.lastY) * CONFIG.throwForce;
+
+        const maxVelocity = 25;
+        obj.vx = Math.max(-maxVelocity, Math.min(maxVelocity, obj.vx));
+        obj.vy = Math.max(-maxVelocity, Math.min(maxVelocity, obj.vy));
         
         obj.lastX = currentX;
         obj.lastY = currentY;
@@ -699,4 +698,3 @@ function endGame() {
 // Event Listeners
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('restart-btn').addEventListener('click', startGame);
-el.addEventListener('pointerdown', onStart, { passive: false });
