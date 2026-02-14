@@ -67,6 +67,7 @@ const alertEl = document.getElementById('alert-text');
 const freezeOverlay = document.getElementById('freeze-overlay');
 const gameContainer = document.getElementById('game-container');
 
+
 // Audio Functions
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playTone(freq, type, dur, vol = 0.05) {
@@ -379,12 +380,13 @@ function spawnSingle() {
         const currentX = cx - rect.left;
         const currentY = cy - rect.top;
 
-        obj.vx = (currentX - obj.lastX) * CONFIG.throwForce;
-        obj.vy = (currentY - obj.lastY) * CONFIG.throwForce;
+        obj.vx = ((currentX - obj.lastX) / 16.67) * CONFIG.throwForce;
+        obj.vy = ((currentY - obj.lastY) / 16.67) * CONFIG.throwForce;
 
         const maxVelocity = 25;
         obj.vx = Math.max(-maxVelocity, Math.min(maxVelocity, obj.vx));
         obj.vy = Math.max(-maxVelocity, Math.min(maxVelocity, obj.vy));
+
         
         obj.lastX = currentX;
         obj.lastY = currentY;
@@ -404,6 +406,8 @@ function spawnSingle() {
         if (!obj.dragging) return;
         obj.dragging = false; 
         el.classList.remove('dragging');
+        obj.vx *= 0.7;
+        obj.vy *= 0.7;
     };
 
     el.addEventListener('pointerdown', onStart);
@@ -555,8 +559,11 @@ function applyGravity(obj) {
     return false;
 }
 
+let lastTime = performance.now();
 // Main Game Loop
-function loop() {
+function loop(now) {
+    const delta = (now - lastTime) / 16.67; 
+    lastTime = now;
     if (state.isGameOver) return;
     
     if (!state.isFrozen) {
@@ -572,8 +579,8 @@ function loop() {
                 if (sucked) return;
                 
                 // Movement
-                obj.x += obj.vx;
-                obj.y += currentSpeed + obj.vy;
+                obj.y += (currentSpeed + obj.vy) * delta;
+                obj.x += obj.vx * delta;
 
                 // Friction
                 obj.vx *= CONFIG.friction;
