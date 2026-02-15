@@ -100,6 +100,318 @@ html, body {
     overflow: hidden;
 }
 
+/* ========================================= 
+   AUTH BUTTONS (TOP RIGHT)
+========================================= */
+
+#authButtonsContainer {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 2000;
+    display: flex;
+    gap: 10px;
+}
+
+#guestButtons,
+#userButton {
+    display: flex;
+    gap: 10px;
+}
+
+.auth-top-btn {
+    padding: 10px 24px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+    font-family: 'Noto Sans Thai', sans-serif;
+}
+
+.signup-btn {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
+    color: white;
+}
+
+.signup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(91, 143, 185, 0.3);
+}
+
+.login-btn {
+    background: white;
+    color: var(--accent-primary);
+    border: 2px solid var(--accent-primary);
+}
+
+.login-btn:hover {
+    background: var(--accent-primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(91, 143, 185, 0.3);
+}
+
+.username-btn {
+    background: white;
+    color: var(--text-main);
+    border: 2px solid var(--border-gray);
+    position: relative;
+    padding-left: 44px;
+}
+
+.username-btn::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.username-btn:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(91, 143, 185, 0.2);
+}
+
+/* ========================================= 
+   AUTH OVERLAY & MODAL
+========================================= */
+
+.auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.auth-modal {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    width: 90%;
+    max-width: 420px;
+    animation: slideUp 0.3s ease;
+    border: 2px solid var(--border-gray);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.auth-content {
+    padding: 0;
+}
+
+.auth-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 28px 20px;
+    border-bottom: 2px solid var(--border-gray);
+}
+
+.auth-header h2 {
+    font-size: 1.5rem;
+    color: var(--text-main);
+    font-weight: 700;
+    margin: 0;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-gray);
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.close-modal:hover {
+    background: var(--bg-color);
+    color: var(--text-main);
+    transform: rotate(90deg);
+}
+
+.auth-body {
+    padding: 28px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border-gray);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: 'Noto Sans Thai', sans-serif;
+    transition: all 0.3s ease;
+    background: var(--bg-surface);
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: var(--shadow-focus);
+}
+
+.input-group input::placeholder {
+    color: var(--text-gray);
+}
+
+.auth-submit-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    box-shadow: var(--shadow-medium);
+    font-family: 'Noto Sans Thai', sans-serif;
+}
+
+.auth-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(91, 143, 185, 0.3);
+}
+
+.auth-submit-btn:active {
+    transform: translateY(0);
+}
+
+.logout-btn {
+    background: linear-gradient(135deg, var(--accent-error) 0%, #c96666 100%);
+}
+
+.logout-btn:hover {
+    box-shadow: 0 6px 20px rgba(214, 124, 124, 0.3);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.auth-footer a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.auth-footer a:hover {
+    color: var(--accent-primary-dark);
+    text-decoration: underline;
+}
+
+/* Profile Specific Styles */
+.profile-info {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-primary-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    box-shadow: var(--shadow-medium);
+}
+
+.profile-info h3 {
+    font-size: 1.4rem;
+    color: var(--text-main);
+    font-weight: 700;
+    margin: 0;
+}
+
+.profile-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 16px;
+    background: var(--bg-color);
+    border-radius: 12px;
+    border: 2px solid var(--border-gray);
+}
+
+.stat-item .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+    margin-bottom: 4px;
+}
+
+.stat-item .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
 /* Lane Dividers */
 .lane-divider {
     position: absolute;
@@ -165,7 +477,7 @@ html, body {
     50% { transform: translateY(6px); } 
 }
 
-/* Gravity Wells - à¸«à¸¥à¸¸à¸¡à¸”à¸¹à¸” */
+/* Gravity Wells - หลุมดูด */
 .gravity-well {
     position: absolute;
     bottom: 0;
@@ -316,7 +628,7 @@ html, body {
         0 0 2px rgba(0,0,0,0.1);
 }
 
-/* à¸¢à¸à¹€à¸¥à¸´à¸ box-shadow à¸ªà¸³à¸«à¸£à¸±à¸š triangle */
+/* ยกเลิก box-shadow สำหรับ triangle */
 .game-object.shape-triangle {
     box-shadow: none;
 }
@@ -328,7 +640,7 @@ html, body {
     cursor: grabbing;
 }
 
-/* à¸¢à¸à¹€à¸¥à¸´à¸ box-shadow à¸ªà¸³à¸«à¸£à¸±à¸š triangle à¸•à¸­à¸™ drag */
+/* ยกเลิก box-shadow สำหรับ triangle ตอน drag */
 .game-object.shape-triangle.dragging {
     box-shadow: none;
 }
@@ -345,7 +657,7 @@ html, body {
     100% { transform: scale(0.6) rotate(180deg); opacity: 0.5; }
 }
 
-/* Hitbox à¹ƒà¸«à¸à¹ˆà¸žà¸´à¹€à¸¨à¸© */
+/* Hitbox ให้ใหญ่พิเศษ */
 .game-object::after {
     content: ''; 
     position: absolute;
@@ -367,30 +679,30 @@ html, body {
 }
 
 .shape-triangle { 
-    /* à¸£à¸±à¸à¸©à¸² width/height à¸ªà¸³à¸«à¸£à¸±à¸š hitbox à¹à¸¥à¸° layout */
+    /* รักษา width/height สำหรับ hitbox และ layout */
     width: var(--obj-size) !important;
     height: var(--obj-size) !important;
     background-color: transparent !important;
     background-image: none !important;
     position: relative;
     
-    /* à¸ˆà¸±à¸”à¸‚à¹‰à¸­à¸„à¸§à¸²à¸¡à¹ƒà¸«à¹‰à¸­à¸¢à¸¹à¹ˆà¸•à¸£à¸‡à¸à¸¥à¸²à¸‡ visual à¸‚à¸­à¸‡à¸ªà¸²à¸¡à¹€à¸«à¸¥à¸µà¹ˆà¸¢à¸¡ */
+    /* จัดข้อความให้อยู่ตรงกลาง visual ของสามเหลี่ยม */
     display: flex;
     align-items: center;
     justify-content: center;
     
-    /* à¸‚à¹‰à¸­à¸„à¸§à¸²à¸¡à¹ƒà¸™ triangle */
+    /* ข้อความใน triangle */
     color: rgba(44, 62, 80, 0.85) !important;
     font-weight: 900 !important;
     font-size: calc(var(--obj-size) * 0.45) !important;
     padding: 0;
     
-    /* à¹€à¸žà¸´à¹ˆà¸¡ transform origin à¹ƒà¸«à¹‰à¸­à¸¢à¸¹à¹ˆà¸•à¸£à¸‡à¸à¸¥à¸²à¸‡ visual */
+    /* เพิ่ม transform origin ให้อยู่ตรงกลาง visual */
     padding-top: 2%;
     transform-origin: center 58%;
 }
 
-/* à¹ƒà¸Šà¹‰ ::before à¸ªà¸£à¹‰à¸²à¸‡à¸£à¸¹à¸›à¸ªà¸²à¸¡à¹€à¸«à¸¥à¸µà¹ˆà¸¢à¸¡à¸ªà¸µà¸ˆà¸£à¸´à¸‡ - à¸­à¸¢à¸¹à¹ˆà¸‚à¹‰à¸²à¸‡à¸«à¸¥à¸±à¸‡ */
+/* ใช้ ::before สร้างรูปสามเหลี่ยมสีจริง - อยู่ข้างหลัง */
 .shape-triangle::before {
     content: '';
     position: absolute;
@@ -560,35 +872,4 @@ button:active {
 
 #ui-layer {
     will-change: transform;
-}
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-
-.auth-box {
-  background: white;
-  padding: 30px;
-  border-radius: 16px;
-  width: 300px;
-  text-align: center;
-}
-
-.auth-box input {
-  width: 100%;
-  margin: 8px 0;
-  padding: 8px;
-  font-size: 16px;
-}
-
-.auth-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
 }
