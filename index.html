@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MindSwitch</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Auth Buttons (Top Right) -->
+    <div id="authButtonsContainer">
+        <!-- When NOT logged in -->
+        <div id="guestButtons" class="hidden">
+            <button id="signupBtn" class="auth-top-btn signup-btn">Sign Up</button>
+            <button id="loginTopBtn" class="auth-top-btn login-btn">Log In</button>
+        </div>
+        
+        <!-- When logged in -->
+        <div id="userButton" class="hidden">
+            <button id="usernameBtn" class="auth-top-btn username-btn">
+                <span id="usernameDisplay"></span>
+            </button>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div class="lane-divider left-divider"></div>   
+        <div class="lane-divider right-divider"></div>
+
+        <div id="freeze-overlay" class="freeze-overlay hidden"></div>
+
+        <div id="start-screen" class="screen">
+            <h1 class="brand-title">MindSwitch</h1>
+            <p class="brand-subtitle">จดจ่อเข้าไว้!</p>
+            <div class="instruction-box">
+                <p><b>วิธีเล่น:</b>แยก object ตามรูปแบบกฏ หากไม่ตรงตามกฏทิ้งช่องกลาง</p>
+                <p><b>กฎ: </b> [รูปแบบ 1] (แยกไปช่องซ้าย) | [รูปแบบกฎ 2] (แยกไปช่องขวา)</p>
+                <p><b>score: </b> ✅+5  ❌-2</p>
+                <p><b>ปล. </b>เมื่อกฎเปลี่ยน object ของกฎก่อนหน้าจะหายไป</p>
+            </div>
+            <button id="start-btn">เริ่มทดสอบ</button>
+        </div>
+
+        <div id="ui-layer">
+            <div class="stat-box">
+                <div class="stat-label">SCORE</div>
+                <span id="score-val">0</span>
+            </div>
+            <div id="rule-wrapper">
+                <div id="rule-display">เตรียมตัว...</div>
+                <div id="rule-warning-bar"></div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">TIME</div>
+                <span id="time-val">150</span>
+            </div>
+        </div>
+
+        <div id="alert-text">⚠️</div>
+
+        <div id="play-area">
+            <div class="gravity-well gravity-left"></div>
+            <div class="gravity-well gravity-center trash"></div>
+            <div class="gravity-well gravity-right"></div>
+            
+            <div class="zone-indicator zone-left">
+                <span class="zone-text text-valid">ซ้าย</span>
+                <div class="arrow-down arrow-valid"></div>
+            </div>
+            
+            <div class="zone-indicator zone-center">
+                <span class="zone-text text-trash">ทิ้งขยะ (+2)</span>
+                <div class="arrow-down arrow-trash"></div>
+            </div>
+
+            <div class="zone-indicator zone-right">
+                <span class="zone-text text-valid">ขวา</span>
+                <div class="arrow-down arrow-valid"></div>
+            </div>
+        </div>
+
+        <div id="end-screen" class="screen hidden">
+            <h1 class="end-title">สรุปผลการทดสอบ</h1>
+            <div class="result-container">
+                <div class="result-item score">
+                    <span id="res-score">0</span>คะแนน
+                </div>
+                <div class="result-item accuracy">
+                    <span id="res-acc">0%</span>แม่นยำ
+                </div>
+            </div>
+            <button id="restart-btn">เริ่มใหม่อีกครั้ง</button>
+        </div>
+    </div>
+
+    <!-- Auth Overlay -->
+    <div id="authOverlay" class="auth-overlay hidden">
+        <div class="auth-modal">
+            <!-- Sign Up Modal -->
+            <div id="signupModal" class="auth-content hidden">
+                <div class="auth-header">
+                    <h2>สร้างบัญชีใหม่</h2>
+                    <button class="close-modal" data-close="signup">×</button>
+                </div>
+                
+                <div class="auth-body">
+                    <div class="input-group">
+                        <label>ชื่อผู้ใช้</label>
+                        <input type="text" id="signupUsername" placeholder="กรอกชื่อผู้ใช้">
+                    </div>
+                    <div class="input-group">
+                        <label>รหัสผ่าน</label>
+                        <input type="password" id="signupPassword" placeholder="กรอกรหัสผ่าน">
+                    </div>
+                    
+                    <button id="registerBtn" class="auth-submit-btn">สมัครสมาชิก</button>
+                    
+                    <div class="auth-footer">
+                        <span>มีบัญชีอยู่แล้ว? </span>
+                        <a href="#" id="switchToLogin">เข้าสู่ระบบ</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Modal -->
+            <div id="loginModal" class="auth-content hidden">
+                <div class="auth-header">
+                    <h2>เข้าสู่ระบบ</h2>
+                    <button class="close-modal" data-close="login">×</button>
+                </div>
+                
+                <div class="auth-body">
+                    <div class="input-group">
+                        <label>ชื่อผู้ใช้</label>
+                        <input type="text" id="loginUsername" placeholder="กรอกชื่อผู้ใช้">
+                    </div>
+                    <div class="input-group">
+                        <label>รหัสผ่าน</label>
+                        <input type="password" id="loginPassword" placeholder="กรอกรหัสผ่าน">
+                    </div>
+                    
+                    <button id="loginBtn" class="auth-submit-btn">เข้าสู่ระบบ</button>
+                    
+                    <div class="auth-footer">
+                        <span>ยังไม่มีบัญชี? </span>
+                        <a href="#" id="switchToSignup">สมัครสมาชิก</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Modal -->
+            <div id="profileModal" class="auth-content hidden">
+                <div class="auth-header">
+                    <h2>โปรไฟล์</h2>
+                    <button class="close-modal" data-close="profile">×</button>
+                </div>
+                
+                <div class="auth-body">
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <span id="profileInitial">U</span>
+                        </div>
+                        <h3 id="profileUsername">Username</h3>
+                    </div>
+                    
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="profileGames">0</div>
+                            <div class="stat-label">เกมที่เล่น</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="profileBestScore">0</div>
+                            <div class="stat-label">คะแนนสูงสุด</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="profileAvgAcc">0%</div>
+                            <div class="stat-label">ความแม่นยำเฉลี่ย</div>
+                        </div>
+                    </div>
+                    
+                    <button id="logoutBtn" class="auth-submit-btn logout-btn">ออกจากระบบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
