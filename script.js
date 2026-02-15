@@ -5,12 +5,12 @@ const CONFIG = {
     freezeDuration: 2500,
     
     // Dynamic Difficulty Settings
-    initialSpawnRate: 2200,      // เริ่มช้าขึ้นเล็กน้อย
-    minSpawnRate: 900,           // ไม่ให้เร็วจนเกินไป
+    initialSpawnRate: 2200,      // เริ่มช้า สำหรับ warm-up
+    minSpawnRate: 900,           // เร็วสุดในช่วงท้าย
     maxSpawnRate: 2500,          // spawn ช้าสุดเมื่อเล่นแย่
     
-    initialSpeed: 1.5,           // เริ่มช้าลง
-    maxSpeed: 5.5,               // ไม่ให้เร็วจนเกินไป
+    initialSpeed: 1.5,           // เริ่มช้า สำหรับ warm-up
+    maxSpeed: 5.5,               // เร็วสุดในช่วงท้าย
     minSpeed: 1.2,               // ช้าสุดเมื่อเล่นแย่
     
     // Flow State Tuning (ปรับตาม performance)
@@ -18,8 +18,8 @@ const CONFIG = {
     difficultyAdjustSpeed: 0.3,  // ความเร็วในการปรับความยาก (0-1)
     
     // Sigmoid Curve Parameters
-    speedCurveMidpoint: 0.5,     // จุดกลางของ S-curve (0-1)
-    speedCurveSteepness: 8,      // ความชันของ curve
+    speedCurveMidpoint: 0.4,     // จุดกลางของ S-curve (0-1)
+    speedCurveSteepness: 10,     // ความชันของ curve - เร่งเร็ว
     
     // Physics Config
     friction: 0.92,
@@ -148,7 +148,19 @@ function adjustDifficulty() {
  * คำนวณความเร็วแบบ Sigmoid + Dynamic
  */
 function getCurrentSpeed() {
-    const progress = state.elapsedTime / CONFIG.gameDuration;
+    // Warm-up period: 15 วินาทีแรก (ช่วงกฎแรก)
+    const warmupDuration = 15;
+    
+    if (state.elapsedTime <= warmupDuration) {
+        // ช่วง warm-up: ใช้ความเร็วต่ำ
+        return CONFIG.initialSpeed;
+    }
+    
+    // หลัง warm-up: เร่งความยากขึ้นเรื่อยๆ
+    const postWarmupTime = state.elapsedTime - warmupDuration;
+    const remainingTime = CONFIG.gameDuration - warmupDuration;
+    const progress = Math.min(postWarmupTime / remainingTime, 1);
+    
     const sigmoidValue = sigmoidCurve(progress);
     
     // ความเร็วพื้นฐานจาก time progression
@@ -165,7 +177,19 @@ function getCurrentSpeed() {
  * คำนวณ Spawn Rate แบบ Dynamic ตาม Score และ Performance
  */
 function getCurrentSpawnRate() {
-    const progress = state.elapsedTime / CONFIG.gameDuration;
+    // Warm-up period: 15 วินาทีแรก (ช่วงกฎแรก)
+    const warmupDuration = 15;
+    
+    if (state.elapsedTime <= warmupDuration) {
+        // ช่วง warm-up: spawn ช้า
+        return CONFIG.initialSpawnRate;
+    }
+    
+    // หลัง warm-up: spawn เร็วขึ้นเรื่อยๆ
+    const postWarmupTime = state.elapsedTime - warmupDuration;
+    const remainingTime = CONFIG.gameDuration - warmupDuration;
+    const progress = Math.min(postWarmupTime / remainingTime, 1);
+    
     const sigmoidValue = sigmoidCurve(progress);
     
     // Spawn rate พื้นฐาน (ยิ่งเล่นนาน ยิ่ง spawn เร็ว)
@@ -262,6 +286,103 @@ const ruleGens = [
     }}
 ];
 
+// Pop all objects with animation and sound effect
+function popAllObjects() {
+    // สร้างสำเนาของ array เพื่อป้องกันปัญหาจาก concurrent modification
+    const objectsToRemove = [...state.objects];
+    
+    objectsToRemove.forEach((obj, index) => {
+        // Delay แต่ละ object เล็กน้อยเพื่อให้ดูเป็น cascade effect
+        setTimeout(() => {
+            if (!obj.el || !obj.el.parentNode) return; // Skip ถ้า element ถูกลบไปแล้ว
+            
+            // เล่นเสียง pop (แต่ละตัวจะมีเสียงสูงต่างกันเล็กน้อย)
+            const freq = 800 + (index * 50) + Math.random() * 100;
+            playTone(freq, 'sine', 0.08, 0.06);
+            
+            // เพิ่ม animation class
+            obj.el.style.transition = 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+            obj.el.style.transform = 'scale(0) rotate(180deg)';
+            obj.el.style.opacity = '0';
+            
+            // สร้าง particle effect เล็กๆ
+            const objCenterX = obj.x + (obj.el.offsetWidth / 2);
+            const objCenterY = obj.y + (obj.el.offsetHeight / 2);
+            
+            // Particle effect แบบเล็กๆ (2 particles ต่อ object)
+            for (let i = 0; i < 2; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.backgroundColor = obj.color.hex;
+                p.style.width = '4px';
+                p.style.height = '4px';
+                p.style.left = objCenterX + 'px';
+                p.style.top = objCenterY + 'px';
+                
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * 25 + 10;
+                
+                p.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 0.8 },
+                    { transform: `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px) scale(0)`, opacity: 0 }
+                ], { duration: 300, easing: 'ease-out' }).onfinish = () => p.remove();
+                
+                playArea.appendChild(p);
+            }
+            
+            // สร้าง spark effect (ประกายไฟ 8 เส้น)
+            for (let i = 0; i < 8; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'spark';
+                spark.style.left = objCenterX + 'px';
+                spark.style.top = objCenterY + 'px';
+                
+                const angle = (Math.PI * 2 / 8) * i + Math.random() * 0.2; // กระจาย 8 ทิศทาง
+                const length = Math.random() * 35 + 30; // ความยาวของประกาย 30-65px
+                
+                const endX = Math.cos(angle) * length;
+                const endY = Math.sin(angle) * length;
+                
+                // สร้างเส้นประกาย
+                spark.style.width = '3px';
+                spark.style.height = length + 'px';
+                spark.style.background = `linear-gradient(to bottom, ${obj.color.hex}, transparent)`;
+                spark.style.transformOrigin = 'top center';
+                spark.style.transform = `rotate(${angle}rad)`;
+                
+                spark.animate([
+                    { 
+                        opacity: 1, 
+                        transform: `rotate(${angle}rad) translateY(0) scaleY(1)`,
+                        filter: 'brightness(2.5)'
+                    },
+                    { 
+                        opacity: 0, 
+                        transform: `rotate(${angle}rad) translateY(${length * 0.6}px) scaleY(0.2)`,
+                        filter: 'brightness(0.5)'
+                    }
+                ], { 
+                    duration: 350 + Math.random() * 150, 
+                    easing: 'ease-out' 
+                }).onfinish = () => spark.remove();
+                
+                playArea.appendChild(spark);
+            }
+            
+            // ลบ element หลังจาก animation เสร็จ
+            setTimeout(() => {
+                if (obj.el && obj.el.parentNode) {
+                    obj.el.remove();
+                }
+            }, 300);
+            
+        }, index * 30); // Cascade delay 30ms ต่อ object
+    });
+    
+    // Clear objects array
+    state.objects = [];
+}
+
 function setRule() {
     if (state.isGameOver) return;
     
@@ -279,6 +400,13 @@ function setRule() {
         state.isFrozen = false;
         freezeOverlay.classList.add('hidden');
         gameContainer.classList.remove('is-frozen');
+        
+        // Pop วัตถุทั้งหมดหลังจาก unfreeze 1 วินาที
+        setTimeout(() => {
+            if (!state.isGameOver) {
+                popAllObjects();
+            }
+        }, 1000);
         
         clearTimeout(state.hideTime);
         state.hideTime = setTimeout(() => { 
