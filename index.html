@@ -6,9 +6,8 @@
     <title>MindSwitch: The Memory Sprint</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+</head>
 <body>
-
     <div id="game-container">
         <div class="lane-divider left-divider"></div>   
         <div class="lane-divider right-divider"></div>
@@ -79,6 +78,39 @@
         </div>
     </div>
 
+    <button id="accountBtn">Account</button>
+
+    <div id="authOverlay" class="overlay hidden">
+        <div class="auth-box">
+
+            <!-- SECTION: NOT LOGGED IN -->
+            <div id="authLoggedOut">
+                <h2>Account</h2>
+
+                <input type="text" id="username" placeholder="Username">
+                <input type="password" id="password" placeholder="Password">
+                <input type="text" id="classroom" placeholder="Class (optional)">
+
+                <div class="auth-buttons">
+                    <button id="loginBtn">Login</button>
+                    <button id="registerBtn">Register</button>
+                </div>
+            </div>
+
+            <!-- SECTION: LOGGED IN -->
+            <div id="authLoggedIn" class="hidden">
+                <h2 id="welcomeText"></h2>
+
+                <button id="viewProfileBtn">View Profile</button>
+                <button id="logoutBtn">Logout</button>
+            </div>
+
+            <button id="closeAuth">Close</button>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="script.js"></script>
 </body>
 </html>
