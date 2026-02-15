@@ -49,7 +49,6 @@ async function updateUI() {
 async function register() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value.trim();
-    const classroom = document.getElementById("classroom").value.trim();
 
     if (!username || !password) {
         alert("กรอกข้อมูลให้ครบ");
@@ -72,7 +71,6 @@ async function register() {
         {
             id: data.user.id,
             username,
-            classroom
         }
     ]);
 
@@ -1007,5 +1005,6 @@ function endGame() {
 // Event Listeners
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('restart-btn').addEventListener('click', startGame);
+
 
 updateUI();
