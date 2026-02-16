@@ -711,7 +711,7 @@ html, body {
 }
 
 .shape-square { 
-    border-radius: 16px; 
+    border-radius: 8px; 
     border: 2px solid rgba(255, 255, 255, 0.5);
 }
 
