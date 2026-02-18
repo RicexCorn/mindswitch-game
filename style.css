@@ -1070,3 +1070,61 @@ button:active {
     will-change: transform;
     contain: layout paint;
 }
+
+/* =========================================
+   ANNOUNCEMENT BANNER
+========================================= */
+
+.announcement-banner {
+    position: fixed;
+    bottom: 0; /* เปลี่ยนจาก top เป็น bottom */
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #6AB187 0%, #5a9a72 100%);
+    color: white;
+    padding: 12px 0;
+    z-index: 9999;
+    overflow: hidden;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15); /* เปลี่ยนเป็นเงาด้านบน */
+    border-top: 3px solid var(--accent-success); /* เปลี่ยนจาก border-bottom เป็น border-top */
+    display: none; /* ซ่อนโดย default */
+}
+
+.announcement-banner.show {
+    display: block; /* แสดงเฉพาะตอนปิดกิจกรรม */
+}
+
+.announcement-content {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee 25s linear infinite;
+}
+
+.announcement-content span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0 100px;
+    display: inline-block;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* ไม่ต้อง padding เพราะ banner อยู่ด้านล่างแล้ว */
+
+@media screen and (max-width: 600px) {
+    .announcement-content span {
+        font-size: 0.95rem;
+        padding: 0 50px;
+    }
+    
+    .announcement-banner {
+        padding: 10px 0;
+    }
+}
