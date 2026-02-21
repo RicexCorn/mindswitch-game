@@ -328,18 +328,41 @@ function closeOverlay() {
 ========================================= */
 
 async function saveGame(score, accuracy) {
-    const { data } = await supabaseClient.auth.getUser();
-    const user = data.user;
+    try {
+        const { data, error: userError } = await supabaseClient.auth.getUser();
+        const user = data?.user;
 
-    if (!user) return;
-
-    await supabaseClient.from("game_history").insert([
-        {
-            user_id: user.id,
-            score,
-            accuracy
+        if (userError) {
+            console.error("Error getting user:", userError);
+            return;
         }
-    ]);
+
+        if (!user) {
+            console.log("No user logged in - score not saved");
+            return;
+        }
+
+        console.log("Saving game:", { user_id: user.id, score, accuracy });
+
+        const { data: insertData, error: insertError } = await supabaseClient
+            .from("game_history")
+            .insert([
+                {
+                    user_id: user.id,
+                    score,
+                    accuracy
+                }
+            ]);
+
+        if (insertError) {
+            console.error("Error saving game:", insertError);
+            alert("เกิดข้อผิดพลาดในการบันทึกคะแนน: " + insertError.message);
+        } else {
+            console.log("Game saved successfully!");
+        }
+    } catch (err) {
+        console.error("Unexpected error in saveGame:", err);
+    }
 }
 
 
@@ -894,17 +917,17 @@ function handleSort(obj, zone) {
         showFloatingText(obj.x, playArea.clientHeight - 80, "+5", "#6AB187"); // Mint Green
         
     } else if (result === 'incorrect') {
-        state.score = Math.max(0, state.score - 2); 
+        state.score = Math.max(0, state.score - 5); 
         state.stats.incorrect++;
         updateDifficulty(false);
         
         playTone(196, 'sawtooth', 0.2, 0.08);
         
         createParticles(obj.x + 32, playArea.clientHeight - 80, "#D67C7C", 8); // Soft Red
-        showFloatingText(obj.x, playArea.clientHeight - 80, "-2", "#D67C7C"); // Soft Red
+        showFloatingText(obj.x, playArea.clientHeight - 80, "-5", "#D67C7C"); // Soft Red
         
     } else if (result === 'trash-correct') {
-        state.score += 2; 
+        state.score += 5; 
         state.stats.correct++;
         updateDifficulty(true);
         
@@ -912,11 +935,11 @@ function handleSort(obj, zone) {
         setTimeout(() => {
             playTone(587, 'triangle', 0.1, 0.04);
         }, 80);
-        showFloatingText(obj.x, playArea.clientHeight - 80, "+2", "#5B8FB9"); // Medical Blue
+        showFloatingText(obj.x, playArea.clientHeight - 80, "+5", "#5B8FB9"); // Medical Blue
     } else if (result === 'trash-incorrect') {
-        state.score = Math.max(0, state.score - 2); state.stats.incorrect++;
+        state.score = Math.max(0, state.score - 5); state.stats.incorrect++;
         playTone(180, 'sawtooth', 0.15, 0.08);
-        showFloatingText(obj.x, playArea.clientHeight - 80, "-2", "#D67C7C"); // Soft Red
+        showFloatingText(obj.x, playArea.clientHeight - 80, "-5", "#D67C7C"); // Soft Red
     }
 
     obj.el.style.display = 'none';
@@ -1202,7 +1225,7 @@ document.getElementById('leaderboardButtonContainer').style.display = 'block';
 // ตั้งเวลาปิดกิจกรรม - 00:00 น. วันที่ 19 กุมภาพันธ์ 2026
 const EVENT_END_DATE = new Date('2026-02-19T00:00:00');
 
-const CLOSED_MESSAGE = '🏆 ขอบคุณที่เข้าร่วมกิจกรรม MindSwitch Challenge! • ขอให้ทุกคนโชคดีและเพิ่มสมาธิไปด้วยกัน 💪 • หากเล่นหลังจากนี้จะไม่นับคะแนนเข้า Leaderboard ใครที่ได้อันดับ Top 3 ติดต่อ LineID: 135789911 หรือ IG:jing_jangdi';
+const CLOSED_MESSAGE = '🏆 ขอบคุณที่เข้าร่วมกิจกรรม MindSwitch Challenge! • ขอให้ทุกคนโชคดีและเพิ่มสมาธิไปด้วยกัน 💪 • หากเล่นหลังจากนี้จะไม่นับคะแนนเข้า Leaderboard ใครที่ได้อันดับ Top 3 ติดต่อ LineID: 135789911 หรือ IG: jing_jangdi';
 
 let isEventActive = true;
 
@@ -1223,13 +1246,10 @@ function checkEventStatus() {
     }
 }
 
-// Override saveGame function เพื่อไม่บันทึกคะแนนหลังกิจกรรมปิด
+// Override saveGame function - ปิดการตรวจสอบวันที่ ให้บันทึกคะแนนต่อได้
 const originalSaveGame = saveGame;
 saveGame = function(score, accuracy) {
-    if (!isEventActive) {
-        console.log('กิจกรรมปิดแล้ว - ไม่บันทึกคะแนนเข้า Leaderboard');
-        return; // ไม่บันทึกคะแนน
-    }
+    // เอาการเช็ค isEventActive ออก - บันทึกคะแนนได้เสมอ
     originalSaveGame(score, accuracy);
 };
 
